@@ -1,0 +1,8 @@
+{
+  "agentPromptRequest": {
+    "agentName": "another-realtime-agent",
+    "prompt": "You are a second helpful assistant for testing list functionality.",
+    "model": "AGENTMODEL_GPT_REALTIME"
+  },
+  "deploymentType": "DEPLOYMENT_TYPE_RT"
+}

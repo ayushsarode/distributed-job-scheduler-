@@ -1,0 +1,124 @@
+syntax = "proto3";
+
+package agentdeploymentservice.exiro.ai;
+option go_package = "exiro.ai/application/models/pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+
+// TODO: Rename to DeploymentService
+service DeployService {
+    // Creates a new agent.
+    rpc CreateAgent(CreateAgentRequest) returns (CreateAgentResponse);
+
+    // Retrieves details of an agent by ID.
+    rpc GetAgent(GetAgentRequest) returns (GetAgentResponse);
+
+    // Lists all agents.
+    rpc ListAgents(ListAgentRequest) returns (ListAgentResponse);
+
+    // Deploys an agent by ID.
+    rpc DeployAgent(DeployAgentRequest) returns (google.protobuf.Empty);
+
+    // Update an agent.
+    rpc UpdateAgent(UpdateAgentRequest) returns (google.protobuf.Empty);
+}
+
+
+enum AgentModel {
+    AGENTMODEL_UNSPECIFIED = 0;
+    AGENTMODEL_GPT_REALTIME = 1;
+    AGENTMODEL_GPT_4OMINI = 2;
+}
+
+enum DeploymentType {
+    DEPLOYMENT_TYPE_UNKNOWN = 0;
+    DEPLOYMENT_TYPE_LG = 1;
+    DEPLOYMENT_TYPE_WS = 2;
+    DEPLOYMENT_TYPE_RT = 3;
+}
+
+// Request message for creating an agent.
+message CreateAgentRequest {
+    oneof createAgentRequest {
+     AgentTemplateRequest agentTemplateRequest = 1;
+     AgentPromptRequest agentPromptRequest = 2;
+    }
+    DeploymentType deployment_type = 3;
+}
+
+// Response message for creating an agent.
+message CreateAgentResponse {
+    string agent_id = 1;
+}
+
+message AgentPromptRequest {
+    string agent_name = 1;
+    string prompt = 2;
+    AgentModel model = 3;
+}
+
+// Defines the template for an agent.
+message AgentTemplateRequest {
+    string template_id = 1;
+    string agent_name = 2;
+    map<string, string> params = 3;
+}
+
+// Request message for retrieving an agent.
+message GetAgentRequest {
+    string agent_id = 1;
+}
+
+// Response message containing agent details.
+message GetAgentResponse {
+    string agent_id = 1;
+    string agent_name = 2;
+    CreateAgentRequest agent_info = 3;
+    DeploymentStatus deployment_status = 4;
+    google.protobuf.Timestamp created_at = 5;
+    google.protobuf.Timestamp updated_at = 6;
+    string created_by = 7;
+}
+
+// Request message for deploying an agent.
+message DeployAgentRequest {
+    string agent_id = 1;
+}
+
+message ListAgentRequest {
+    repeated DeploymentStatus statuses = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message ListAgentResponse {
+    repeated ListAgentResponseItem agents = 1;
+    int32 total_count = 2;
+}
+
+message ListAgentResponseItem {
+    string agent_id = 1;
+    string agent_name = 2;
+    DeploymentStatus deployment_status = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+    string created_by = 6;
+}
+
+// Request message for updating an agent.
+message UpdateAgentRequest {
+    string agent_id = 1;
+    string agent_name = 2;
+    CreateAgentRequest create_agent_request = 3;
+}
+
+enum DeploymentStatus {
+    DEPLOYMENT_STATUS_UNKNOWN = 0;
+
+    DEPLOYMENT_STATUS_NOT_DEPLOYED = 1;
+    DEPLOYMENT_STATUS_IN_PROGRESS = 2;
+    DEPLOYMENT_STATUS_SUCCESS = 3;
+    DEPLOYMENT_STATUS_FAILED = 4;
+}

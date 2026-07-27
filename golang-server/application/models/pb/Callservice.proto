@@ -1,0 +1,41 @@
+syntax = "proto3";
+package public.callservice.exiro.ai;
+option go_package = "exiro.ai/application/models/pb";
+
+
+service CallService {
+
+    rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse) {}
+
+ }
+
+ message CreateSessionRequest {
+    string agent_id = 1;
+ }
+
+ message CreateSessionResponse {
+    string session_id = 1;
+ }
+
+
+message AgentCallEvent {
+    oneof event {
+        Clear clear = 1;
+        Audio audio = 2;
+    }
+}
+
+message Clear{}
+
+message Audio{
+    bytes audio = 1;
+    AudioEncoding encoding = 2;
+}
+
+enum AudioEncoding {
+    AUDIO_ENCODING_UNKNOWN = 0;
+    AUDIO_ENCODING_MULAW = 1;
+    AUDIO_ENCODING_MP3 = 2;
+    AUDIO_ENCODING_LINEAR16 = 3;
+    AUDIO_ENCODING_OGG_OPUS = 4;
+}

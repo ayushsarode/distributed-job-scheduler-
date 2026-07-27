@@ -20,7 +20,7 @@ func RateLimit(limiter *cache.RateLimiter) func(http.Handler) http.Handler {
 				return
 			}
 
-			// set rate limit headers
+			// set rate limit headert
 			w.Header().Set("X-RateLimit-Remaining", fmt.Sprintf("%d", remaining))
 
 			if !allowed {

@@ -1,0 +1,122 @@
+version: "2"
+
+run:
+  timeout: 20m
+
+linters:
+  enable:
+    # Core correctness
+    - govet
+    - staticcheck
+    - errcheck
+    - gosec
+    - ineffassign
+    - unused
+    - nilerr
+    - nilnil
+    - nilnesserr
+    - rowserrcheck
+    - sqlclosecheck
+    - bodyclose
+
+    # Unicode / safety
+    - bidichk
+    - asciicheck
+
+    # Error handling & naming
+    - errorlint
+    - errname
+
+    # Complexity & structure
+    - gocyclo
+    - nakedret
+    - dupl
+    - nestif
+    - funlen
+    - gocognit
+    - cyclop
+
+    # Code quality
+    - unparam
+    - unconvert
+    - wastedassign
+    - makezero
+    - prealloc
+    - exptostd
+    - intrange
+    - copyloopvar
+    - durationcheck
+    - mirror
+    - modernize
+    - perfsprint
+    - forbidigo
+    - mnd
+    - gocritic
+
+    # Context / HTTP
+    - noctx
+    - canonicalheader
+    - nosprintfhostport
+
+    # Logging / metrics / tracing
+    - loggercheck
+    - sloglint
+    - spancheck
+    - promlinter
+
+    # Structs / interfaces / proto
+    - embeddedstructfieldcheck
+    - iface
+    - musttag
+    - protogetter
+
+    # Imports / modules
+    - gomoddirectives
+
+    # Docs / formatting
+    - godot
+    - whitespace
+    - misspell
+    - nolintlint
+
+    # Testing
+    - testableexamples
+    - testifylint
+    - tparallel
+    - usetesting
+
+    # General hygiene
+    - nonamedreturns
+    - reassign
+    - predeclared
+    - iotamixing
+    - goprintffuncname
+
+    - gochecksumtype
+    - gocheckcompilerdirectives
+    - exhaustive
+    - revive
+
+    # SQL
+    - unqueryvet
+
+  settings:
+    revive:
+      rules:
+        - name: early-return
+        - name: error-naming
+        - name: receiver-naming
+
+  exclusions:
+    rules:
+      - path: ^testing/
+        linters:
+          - dupl
+
+      - path: (.+)_test.go
+        linters:
+          - gosec
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -1,0 +1,117 @@
+syntax = "proto3";
+package grpc.exiro.ai;
+option go_package = "exiro.ai/application/models/pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// WorkflowService manages workflow entities
+service WorkflowService {
+    // Creates a new workflow (status = 'draft' by default)
+    rpc CreateWorkflow(CreateWorkflowRequest) returns (CreateWorkflowResponse);
+    
+    // Retrieves a workflow by ID
+    rpc GetWorkflow(GetWorkflowRequest) returns (GetWorkflowResponse);
+    
+    // Lists workflows with optional filtering
+    rpc ListWorkflows(ListWorkflowsRequest) returns (ListWorkflowsResponse);
+    
+    // Updates workflow details (name, description, agent_id)
+    rpc UpdateWorkflow(UpdateWorkflowRequest) returns (google.protobuf.Empty);
+    
+    // Publishes a workflow (draft → published)
+    rpc PublishWorkflow(PublishWorkflowRequest) returns (google.protobuf.Empty);
+      
+    // Deactivate a workflow
+    rpc DeactivateWorkflow(DeactivateWorkflowRequest) returns (google.protobuf.Empty);
+    
+    // Deletes a workflow (only if not active)
+    rpc DeleteWorkflow(DeleteWorkflowRequest) returns (google.protobuf.Empty);
+}
+
+// Create Workflow
+message CreateWorkflowRequest {
+    string name = 1;
+    string description = 2;
+    string agent_id = 3;
+}
+message CreateWorkflowResponse {
+    string workflow_id = 1;
+}
+
+// Get Workflow
+message GetWorkflowRequest {
+    string workflow_id = 1;
+}
+message GetWorkflowResponse {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string agent_id = 4;
+    WorkflowStatus status = 5;
+    string created_by = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+    
+    // Additional metadata
+    int32 active_campaigns_count = 9;   // Number of active campaigns using this workflow
+    int32 total_calls = 10;             // Total calls made using this workflow
+}
+
+// List Workflows
+message ListWorkflowsRequest {
+    // Pagination
+    int32 limit = 1;                        // Default: 25, Max: 100
+    int32 offset = 2;                       // Default: 0
+    
+    // Filters
+    repeated WorkflowStatus statuses = 3;   // Filter by status (empty = all)
+    string search_query = 4;                // Search by workflow name (case-insensitive)
+    string agent_id = 5;                    // Filter by agent_id
+}
+message ListWorkflowsResponse {
+    repeated ListWorkFlowResponseItem workflows = 1;
+    int32 total_count = 2;          // Total matching workflows (for pagination)
+}
+message ListWorkFlowResponseItem {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string agent_id = 4;
+    WorkflowStatus status = 5;
+    string created_by = 6;
+    google.protobuf.Timestamp created_at = 7;
+    google.protobuf.Timestamp updated_at = 8;
+}
+
+// Update Workflow
+message UpdateWorkflowRequest {
+    string workflow_id = 1;
+    string name = 2;
+    string description = 3;
+    string agent_id = 4;
+}
+
+// Publish Workflow
+message PublishWorkflowRequest {
+    string workflow_id = 1;
+}
+
+// Deactivate Workflow
+message DeactivateWorkflowRequest {
+    string workflow_id = 1;
+}
+
+// Delete Workflow
+message DeleteWorkflowRequest {
+    string workflow_id = 1;
+}
+
+// Enums
+enum WorkflowStatus {
+    WORKFLOW_STATUS_UNKNOWN = 0;
+
+    WORKFLOW_STATUS_DRAFT = 1;      // Being created, not yet published
+    WORKFLOW_STATUS_PUBLISHED = 2;  // Ready to use, can be selected in campaigns
+    WORKFLOW_STATUS_INACTIVE = 3;   // Disabled, cannot be selected in new campaigns
+}

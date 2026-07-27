@@ -2,6 +2,7 @@
 *.pb.go
 
 # Binaries
+# Local Go tool installs, e.g. bin/mockgen
 bin/
 *.exe
 

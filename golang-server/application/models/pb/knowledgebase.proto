@@ -1,0 +1,40 @@
+syntax = "proto3";
+package grpc.exiro.ai;
+option go_package = "exiro.ai/application/models/pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service KnowledgeBase {
+    rpc ListDocuments (ListDocumentRequest) returns (ListDocumentResponse) {}
+    rpc ChangeDocumentStatus (ChangeDocumentStatusRequest) returns (google.protobuf.Empty) {}
+    rpc DeleteDocument (DeleteDocumentRequest) returns (google.protobuf.Empty) {}
+}
+
+message ListDocumentRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message ListDocumentResponse {
+    repeated Document documents = 1;
+}
+
+message Document {
+    string id = 1;                // UUID of the document
+    string document_name = 2;     // Name of the document
+    bool is_indexed = 4;          // Flag for whether the document is indexed by vector db
+    bool is_active = 5;           // Flag for whether the document is active
+    google.protobuf.Timestamp created_at = 7;        // Timestamp of when the document was created
+    google.protobuf.Timestamp updated_at = 8;        // Timestamp of when the document was last updated
+}
+
+// Document Status Change/Deletion message
+message ChangeDocumentStatusRequest {
+    string document_id = 1;       // UUID of the document
+    bool is_active = 2;            // True to activate, false to deactivate
+}
+
+message DeleteDocumentRequest {
+    string document_id = 1;  // UUID of the document
+}

@@ -1,0 +1,27 @@
+# buf.gen.yaml
+version: v2
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: exiro.ai/application/models
+  disable:
+    - module: buf.build/googleapis/googleapis
+      file_option: go_package_prefix
+plugins:
+  - remote: buf.build/grpc/go:v1.5.1
+    out: application/models
+    opt:
+      - module=exiro.ai/application/models
+  - remote: buf.build/protocolbuffers/go:v1.34.2
+    out: application/models
+    opt:
+      - module=exiro.ai/application/models
+
+inputs:
+  # - git_repo: https://github.com/exiro-ai/monorepo-main.git
+  #   branch: main
+  #   subdir: grpc-langraph-server
+  - directory: ../python-agent-service
+    exclude_paths:
+      - ../python-agent-service/.venv

@@ -1,0 +1,6 @@
+{
+	"name": "Test Call Job <uuid:callJobName>",
+	"workflow_id": "<uuid:workflowId>",
+	"document_id": "test-doc-<smallCase:docId>",
+	"document_type": "csv"
+}

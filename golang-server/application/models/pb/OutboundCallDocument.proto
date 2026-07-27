@@ -1,0 +1,233 @@
+syntax = "proto3";
+package grpc.exiro.ai;
+option go_package = "exiro.ai/application/models/pb";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service OutboundCallDocumentService {
+    rpc UploadOutboundCallDocument(UploadOutboundCallDocumentRequest) returns (UploadOutboundCallDocumentResponse);
+    rpc ListOutboundCallDocuments(ListOutboundCallDocumentsRequest) returns (ListOutboundCallDocumentsResponse);
+    rpc GetOutboundCallDocument(GetOutboundCallDocumentRequest) returns (GetOutboundCallDocumentResponse);
+    rpc DeleteOutboundCallDocument(DeleteOutboundCallDocumentRequest) returns (DeleteOutboundCallDocumentResponse);
+    rpc CreateCallJob (CreateCallJobRequest) returns (CreateCallJobResponse);
+    rpc GetCallJob (GetCallJobRequest) returns (GetCallJobResponse);
+    rpc ListCallJobs (ListCallJobsRequest) returns (ListCallJobsResponse);
+    rpc DeleteCallJob (DeleteCallJobRequest) returns (DeleteCallJobResponse);
+    rpc ListJobItems (ListJobItemsRequest) returns (ListJobItemsResponse);
+    rpc MaterializeJob (MaterializeJobRequest) returns (google.protobuf.Empty);
+    rpc TriggerJob (TriggerJobRequest) returns (google.protobuf.Empty);
+    rpc CopyCallJob (CopyCallJobRequest) returns (CopyCallJobResponse);
+    rpc UpdateCallJobDetails (UpdateCallJobDetailsRequest) returns (google.protobuf.Empty);
+    rpc AddJobItems (AddJobItemsRequest) returns (google.protobuf.Empty);
+    rpc RemoveJobItems (RemoveJobItemsRequest) returns (google.protobuf.Empty);
+}
+
+message UploadOutboundCallDocumentRequest {
+    string file_name = 1;
+    string file_type = 2;
+    bytes file_content = 3;
+}
+
+message UploadOutboundCallDocumentResponse {
+    string documentId = 1;
+}
+
+message ListOutboundCallDocumentsRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message ListOutboundCallDocumentsResponse {
+    repeated OutboundCallDocument documents = 1;
+}
+
+message OutboundCallDocument {
+    string id = 1;                // UUID of the document
+    string file_name = 2;         // Name of the document
+    string created_by = 3;        // User who created the document
+    google.protobuf.Timestamp created_at = 7;        // Timestamp of when the document was created
+    google.protobuf.Timestamp updated_at = 8;        // Timestamp of when the document was last updated
+}
+
+message GetOutboundCallDocumentRequest {
+    string documentId = 1;        // UUID of the document
+    string created_by = 2;        // User who created the document
+}
+
+message GetOutboundCallDocumentResponse {
+    OutboundCallDocument document = 1; // The document details
+}
+
+message DeleteOutboundCallDocumentRequest {
+    string documentId = 1;        // UUID of the document
+    string created_by = 2;        // User who created the document
+}
+
+message DeleteOutboundCallDocumentResponse {
+    string message = 1;           // Confirmation message
+}
+
+
+
+message CreateCallJobRequest {
+    // Required
+    string name = 1;
+    string workflow_id = 2; // We have existing infra for creating workflow.
+    string document_id = 3; // Need a better name for this. This is the list of phone numbers to call.
+    string document_type = 4; // (Can only be csv for now)
+
+    // Optional config.
+    string prefered_language = 5; // (Can only be en / hi for now, need to define enum for this)
+    int32 max_retries = 6; // (Can only be 0 for now)
+    int32 retry_delay = 7; // (Can only be 0 for now)
+
+    // Additional config that will depend on Outbound Call Provider.
+    string outbound_call_provider_id = 8; // (CredentialService's Id)
+}
+message CreateCallJobResponse {
+    string id = 1;
+}
+
+message GetCallJobRequest{
+    string id  = 1;
+}
+message GetCallJobResponse{
+    string id = 1;
+    string name = 2;
+    string agent_id = 3;
+    string workflow_id = 4;
+    string document_id = 5;
+    string document_type = 6;
+    string prefered_language = 7;
+    int32 max_retries = 8;
+    int32 retry_delay = 9;
+    string outbound_call_provider_id = 10;
+    CallJobStatus status = 11;
+    bool is_materialized = 12;
+    google.protobuf.Timestamp created_at = 13;
+}
+
+message ListCallJobsRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+    repeated CallJobStatus statuses = 3;
+    string workflow_id = 4;
+    google.protobuf.Timestamp filter_date_begin = 5;
+    google.protobuf.Timestamp filter_date_end = 6;
+}
+
+message ListCallJobsResponse {
+    repeated GetCallJobResponse call_jobs = 1;
+    int32 total_count = 2;
+}
+
+message DeleteCallJobRequest {
+    string id = 1;
+}
+
+message DeleteCallJobResponse {
+    bool status = 1;
+}
+
+message MaterializeJobRequest{
+    string job_id = 1;
+}
+
+message TriggerJobRequest {
+    string job_id  = 1;
+}
+
+message ListJobItemsRequest {
+    string job_id = 1;
+    int32 limit = 2;
+    int32 offset = 3;
+}
+
+message ListJobItemsResponse {
+    repeated JobItem job_items = 1;
+    int32 total_count = 2;
+}
+
+message JobItem {
+    string id = 1;
+    string phone_number = 2;
+    string agent_context = 3;
+    string job_data = 4;
+    CallJobItemStatus call_status = 6;
+    string external_call_id = 7;
+    google.protobuf.Timestamp call_started_at = 8;
+    google.protobuf.Timestamp call_ended_at = 9;
+    int32 call_duration = 10;
+    string call_error_message = 11;
+    google.protobuf.Timestamp updated_at = 12;
+}
+
+message CopyCallJobRequest {
+    // The job to copy from (must exist and be owned/authorized for caller).
+    string source_job_id = 1;
+    string name = 2;
+    string outbound_call_provider_id = 3;
+    string workflow_id = 4;
+    string prefered_language = 5;
+
+    // The job items to copy. Each must belong to source_job_id.
+    // Must contain at least one item; otherwise INVALID_ARGUMENT.
+    repeated string job_item_ids = 6;
+}
+
+
+message CopyCallJobResponse {
+    // The newly created job id.
+    string new_job_id = 1;
+
+    // Number of items successfully copied.
+    int32 items_copied = 2;
+}
+
+message UpdateCallJobDetailsRequest {
+    string job_id = 1;
+    string name = 2;
+    string workflow_id = 3;
+}
+
+message AddJobItemsRequest {
+    string job_id = 1;
+    repeated NewJobItem items = 2;
+}
+
+message NewJobItem {
+    string phone_number = 1;
+    string agent_context = 2;
+}
+
+message RemoveJobItemsRequest {
+    string job_id = 1;
+    repeated string job_item_ids = 2;
+}
+
+enum CallJobStatus {
+    CALL_JOB_STATUS_UNKNOWN = 0; // required zero-value
+
+    CALL_JOB_STATUS_PENDING = 1;
+    CALL_JOB_STATUS_PROCESSING = 2;
+    CALL_JOB_STATUS_READY = 3;
+    CALL_JOB_STATUS_RUNNING = 4;
+    CALL_JOB_STATUS_COMPLETED = 5;
+    CALL_JOB_STATUS_FAILED = 6;
+}
+
+enum CallJobItemStatus {
+    CALL_JOB_ITEM_STATUS_UNKNOWN = 0; // required zero-value
+
+    CALL_JOB_ITEM_STATUS_PENDING = 1;
+    CALL_JOB_ITEM_STATUS_INITIATED = 2;
+    CALL_JOB_ITEM_STATUS_QUEUED = 3;
+    CALL_JOB_ITEM_STATUS_RINGING = 4;
+    CALL_JOB_ITEM_STATUS_ANSWERED = 5;
+    CALL_JOB_ITEM_STATUS_COMPLETED = 6;
+    CALL_JOB_ITEM_STATUS_BUSY = 7;
+    CALL_JOB_ITEM_STATUS_FAILED = 8;
+    CALL_JOB_ITEM_STATUS_NO_ANSWER = 9;
+    CALL_JOB_ITEM_STATUS_CANCELED = 10;
+}

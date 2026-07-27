@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+package voice_agent.v1;
+
+option go_package = "exiro.ai/application/models/pb";
+
+import "google/protobuf/timestamp.proto";
+
+// The top-level event message sent for every transcription update.
+message TranscriptEvent {
+  // Unique identifier for the entire call session.
+  string session_id = 1;
+
+  // A unique identifier for this specific message, used for deduplication.
+  string segment_id = 2;
+
+  // The identifier of the tenant who owns this transcript.
+  // This must be populated by the CallHandler.
+  string tenant_id = 5;
+
+  oneof event_payload {
+    Segment segment = 3;
+    CallEnd end_of_call = 4;
+  }
+}
+
+// Represents a single chunk of spoken text.
+message Segment {
+  uint64 sequence = 1;
+  Speaker speaker = 2;
+  string text = 3;
+  google.protobuf.Timestamp timestamp = 4;
+  string language_code = 5;
+}
+
+// A message indicating the call has concluded successfully.
+message CallEnd {
+  google.protobuf.Timestamp final_timestamp = 1;
+  float duration_seconds = 2;
+}
+
+enum Speaker {
+  SPEAKER_UNSPECIFIED = 0;
+  AI_AGENT = 1;
+  HUMAN = 2;
+}
+
+// Service to retrieve the metadata and a secure download URL for a transcription.
+service TranscriptionRetrievalService {
+  rpc GetTranscriptionMetadata(GetTranscriptionMetadataRequest) returns (GetTranscriptionMetadataResponse);
+  rpc GetSessionKVData(GetSessionKVDataRequest) returns (GetSessionKVDataResponse);
+}
+
+message GetTranscriptionMetadataRequest {
+  // The unique identifier of the call session to retrieve.
+  string session_id = 1;
+}
+
+message GetTranscriptionMetadataResponse {
+  string session_id = 1;
+  // The current processing status of the transcription.
+  Status status = 2;
+  // The timestamp of when the call was initiated.
+  google.protobuf.Timestamp created_at = 3;
+  // A temporary, secure URL to download the transcript file directly from S3.
+  // This URL is short-lived (e.g., valid for 5 minutes) and will only be
+  // populated when the status is COMPLETED or COMPLETED_STALE.
+  string download_url = 4;
+  // The total duration of the call in seconds.
+  // This will only be populated when the status is COMPLETED or COMPLETED_STALE.
+  float duration_seconds = 5;
+}
+
+// Represents the processing status of a transcription.
+enum Status {
+  STATUS_UNSPECIFIED = 0;
+  IN_PROGRESS = 1;        // The call is ongoing.
+  AGGREGATING = 2;        // The transcript is being assembled and uploaded.
+  COMPLETED = 3;          // The transcript is finalized and available in S3.
+  COMPLETED_STALE = 4;    // The transcript was finalized by the sweeper.
+}
+
+message GetSessionKVDataRequest {
+  string session_id = 1;
+}
+
+message GetSessionKVDataResponse {
+  repeated KVPair kv_pairs = 1;
+}
+
+message KVPair {
+  string key = 1;
+  string value = 2;
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}
+
+message KVStoreEvent {
+  string session_id = 1;
+  string tenant_id  = 2;
+  string key        = 3;
+  string value      = 4;
+}

@@ -1,0 +1,57 @@
+# TODO: Simplify Config and remove unused flags
+
+production_mode: false
+
+http_port: 9090
+database_url: "postgres://postgres:password@localhost:5432/exiro_database?sslmode=disable"
+dbos_database_url: "postgres://postgres:password@localhost:5432/exiro_database?sslmode=disable"
+object_store_type: "LocalStack"
+localstack_endpoint: "http://localhost:4566"
+documents_bucket: "exirobucket"
+agentservice: "python_agent_service"
+
+message_queue_type: LocalStack
+agent_deployment_sqs_queue_name: agentservice
+agent_deployment_check_queue_name: agentdeploymentstatus
+aws_region: us-east-1
+
+transcription_storage:
+  transcriptions_table_name: transcripts
+  agent_kv_store_table_name: agent_kv_store
+  agent_kv_store_queue_name: "agent-kv-store-queue"
+  use_localstack: true
+  transcripts_queue_name: "transcriptionstoragequeue.fifo"
+  s3_bucket_name: "exirobucket"
+  sweeper:
+    sweep_interval_minutes: 5
+    stale_threshold_minutes: 30
+
+tts:
+  # deepgram | elevenlabs | google | sarvam
+  provider: deepgram
+
+stt:
+  provider: deepgram
+
+agent_service:
+  type: grpc # grpc | openai_ws  (openai_ws = OpenAI Responses API via WebSocket)
+  url: "localhost:50051"
+
+realtime:
+  # openai | claude
+  provider: openai
+
+outbound_calling:
+  enabled: true # true | false
+  provider: exotel
+  base_url: "personally-allowing-lacewing.ngrok-free.app" # Base URL of golang server. Use ngrok url for local dev. set to "exiro.ai" in prod
+  exotel_from_phone_number: "08047360926" # Phone number to make outbound calls from
+  twilio_from_phone_number: "+18723122947"
+  max_call_wait_time_minutes: 5 # Maximum time to wait for a single call to complete
+  poll_interval_seconds: 5 # How often to check call status during polling
+  delay_between_calls_seconds: 2 # Delay between sequential calls to prevent overwhelming system
+  campaign_document_bucket: "exiro-campaign-documents" # S3 bucket for campaign documents
+  exotel_voicebot_app_id: "1217178"
+
+credential_service:
+  aws_kms_key_id: "ab398341-9d52-45ca-9a87-95f571317708"
