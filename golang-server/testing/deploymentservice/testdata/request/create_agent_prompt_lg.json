@@ -1,8 +1,0 @@
-{
-  "agentPromptRequest": {
-    "agentName": "test-lg-agent",
-    "prompt": "You are an intelligent assistant powered by LangGraph.",
-    "model": "AGENTMODEL_GPT_4OMINI"
-  },
-  "deploymentType": "DEPLOYMENT_TYPE_LG"
-}

@@ -1,8 +1,0 @@
-.env
-.envrc
-.vscode
-exiro.ai
-application/models/**/*.go
-docker_data
-infra/database/postgres/gen/**/*.go
-mocks/

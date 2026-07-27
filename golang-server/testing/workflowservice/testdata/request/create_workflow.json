@@ -1,5 +1,0 @@
-{
-	"name": "<uuid:workflowName>",
-	"description": "Test workflow for integration testing",
-	"agentId": "<uuid:agentId>"
-}

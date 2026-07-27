@@ -1,8 +1,0 @@
-{
-  "agentPromptRequest": {
-    "agentName": "test-4omini-agent",
-    "prompt": "You are an intelligent assistant powered by GPT-4o-mini.",
-    "model": "AGENTMODEL_GPT_4OMINI"
-  },
-  "deploymentType": "DEPLOYMENT_TYPE_WS"
-}

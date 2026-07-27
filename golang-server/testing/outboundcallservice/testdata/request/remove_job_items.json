@@ -1,4 +1,0 @@
-{
-  "job_id": "<uuid:jobId>",
-  "job_item_ids": ["<uuid:jobItemId1>", "<uuid:jobItemId2>"]
-}

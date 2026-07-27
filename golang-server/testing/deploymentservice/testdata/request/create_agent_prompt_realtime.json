@@ -1,8 +1,0 @@
-{
-  "agentPromptRequest": {
-    "agentName": "test-realtime-agent",
-    "prompt": "You are a helpful assistant that answers questions.",
-    "model": "AGENTMODEL_GPT_REALTIME"
-  },
-  "deploymentType": "DEPLOYMENT_TYPE_RT"
-}
